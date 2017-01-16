@@ -1,8 +1,11 @@
 <?php
 
-require __DIR__.'/vendor/autoload.php';
+// require __DIR__.'/vendor/autoload.php';
 
-use Carbon\Carbon as Carbon;
+// use Carbon\Carbon as Carbon;
+
+echo "test";
+exit;
 
 class VTMConverter
 {
@@ -145,4 +148,4 @@ class VTMConverter
 
 }
 
-$vtmconverter = new VTMConverter($argv);
+// $vtmconverter = new VTMConverter($argv);
