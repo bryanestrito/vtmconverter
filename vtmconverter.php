@@ -4,13 +4,8 @@
 
 // use Carbon\Carbon as Carbon;
 
-echo "test";
-exit;
-
 class VTMConverter
 {
-    const PHP_ENV = "cli";
-
     // commands
     const YOUTUBEDL_CMD = "youtube-dl";
     const FFMPEG_CMD = "ffmpeg";
@@ -21,73 +16,132 @@ class VTMConverter
 
     const FILE_EXTENSION = "m4a";
 
-    const ARGUMENT_COUNT = 3;
+    const ARGUMENT_COUNT = 1;
 
     // arguments
-    public $youtubeUrl;
-    public $title;
-    public $artist;
+    protected $url;
 
-    public $filename;
-    public $duration;
+    protected $startTime;
+    protected $endTime;
 
-    public function __construct($argv)
+    protected $title;
+    protected $artist;
+    protected $album;
+
+    protected $filename;
+    protected $duration;
+
+    public function __construct($url)
     {
-        if (PHP_SAPI != self::PHP_ENV) {
-            return;
-        }
+        // $this->checkAndAssignArguments($arguments);
 
-        $this->vtmconvert($argv);
+        $this->setUrl($url);
     }
 
-    public function vtmconvert($argv)
+    // public function vtmconvert($argv)
+    // {
+    //     try {
+    //         $this->checkAndAssignArguments($argv);
+
+    //         $this->checkCommandsExistence();
+
+    //         $this->generateFilename();
+
+    //         // $this->downloadVideo();
+
+    //         $this->getVideoDuration();
+
+    //         $this->stripStartTime();
+    //     } catch (Exception $e) {
+    //         echo $e->getMessage();
+    //     }
+    // }
+
+    // public function stripStartTime()
+    // {
+    //     $startTime = explode(":", $this->startTime);
+
+    //     switch (count($startTime)) {
+    //         case 3:
+    //             # code...
+    //             break;
+    //         case 2:
+    //             # code...
+    //             break;
+    //         case 1:
+    //             # code...
+    //             break;
+    //     }
+    // }
+
+    protected function setUrl($url)
     {
-        try {
-            $this->checkAndAssignArguments($argv);
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new Exception("Invalid URL received");
+        }
 
-            $this->checkCommandsExistence();
+        $this->url = $url;
+    }
 
-            $this->generateFilename();
+    protected function setTime($startTime = null, $endTime = null)
+    {
+        // optional hour/millseconds pattern
+        // $pattern = '^(?:(?:([01]?\d|2[0-3]):)?([0-5]?\d):)?([0-5]?\d)(\.[0-9]{1,3})?$';
 
-            // $this->downloadVideo();
+        // enforced time format pattern
+        $pattern = '(?:[01]\d|2[0123]):(?:[012345]\d):(?:[012345]\d)\.(?:[0-9]{1,3})$';
 
-            $this->getVideoDuration();
+        if ($startTime) {
+            $timeFormat = preg_match($pattern, $startTime);
 
-            $this->stripStartTime();
-        } catch (Exception $e) {
-            echo $e->getMessage();
+            if (!$timeFormat) {
+                throw new Exception("Incorrect time format");
+            }
+
+            $this->startTime = $startTime;
+        } else {
+            $startTime = "00:00:00.000";
+        }
+
+        if ($endTime) {
+            $timeFormat = preg_match($pattern, $endTime);
+
+            if (!$timeFormat) {
+                throw new Exception("Incorrect time format");
+            }
+
+            $this->endTime = $endTime;
         }
     }
 
-    public function stripStartTime()
-    {
-        $startTime = explode(":", $this->startTime);
+    // public function checkAndAssignArguments($arguments)
+    // {
+    //     if (!is_array($arguments)) {
+    //         throw new Exception("Only accept array argument(s)");
+    //     }
 
-        switch (count($startTime)) {
-            case 3:
-                # code...
-                break;
-            case 2:
-                # code...
-                break;
-            case 1:
-                # code...
-                break;
-        }
-    }
+    //     if (count($this->arguments) < self::ARGUMENT_COUNT) {
+    //         throw new Exception("Insufficient argument(s)");
+    //     }
 
-    public function checkAndAssignArguments($argv)
-    {
-        if (count($argv) < self::ARGUMENT_COUNT) {
-            throw new Exception("Insufficient argument(s)");
-        }
+    //     foreach ($variable as $key => $value) {
+    //         # code...
+    //     }
 
-        $this->youtubeUrl = $argv[1];
-        $this->title = $argv[2];
-        $this->artist = $argv[3];
-        $this->startTime = $argv[4];
-        $this->endTime = $argv[5];
-    }
+    //     $this->setUrl($arguments[1]);
+
+    //     if (count($arguments) == 2) {
+    //         $this->setTtitle($arguments[2]);
+    //     }
+
+    //     if (count($arguments) == 3) {
+    //         $this->setArtist($arguments[3]);
+    //     }
+
+    //     if (count($arguments) == 4) {
+    //         $this->setAlbum($arguments[4]);
+    //     }
+    // }
 
     public function checkCommandsExistence()
     {
@@ -112,19 +166,19 @@ class VTMConverter
     {
         $location = __DIR__ . self::DOWNLOAD_FOLDER;
 
-        $execute = "youtube-dl -f 140 --output " . $location . "\"{$this->filename}\".%\(ext\)s " . $this->youtubeUrl;
+        $execute = "youtube-dl -f 140 --output " . $location . "\"{$this->filename}\".%\(ext\)s " . $this->url;
 
         echo shell_exec($execute);
     }
 
-    public function commandExists($command)
+    private function commandExists($command)
     {
         $executable = shell_exec(sprintf("which %s", escapeshellarg($command)));
 
         return !empty($executable);
     }
 
-    public function getVideoDuration()
+    private function getVideoDuration()
     {
         $location = __DIR__ . self::DOWNLOAD_FOLDER . $this->filename . "." . self::FILE_EXTENSION;
 
@@ -148,4 +202,7 @@ class VTMConverter
 
 }
 
-// $vtmconverter = new VTMConverter($argv);
+// if the script is executed through terminal
+// if (PHP_SAPI == "cli") {
+//     $vtmconverter = new VTMConverter($argv);
+// }

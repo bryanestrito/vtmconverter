@@ -65,16 +65,17 @@
     <!-- Example row of columns -->
     <div class="row">
         <div class="col-md-12">
-            <form method="post" action="vtmconverter.php" name="vtm-form">
+            <form method="post" action="request.php" name="vtm_form">
                 <div class="form-group">
                     <label for="vtm-title">Title:</label>
-                    <input type="text" class="form-control" name="vtm-title" placeholder="Song Title">
+                    <input type="text" class="form-control" name="vtm_title" placeholder="Song Title">
                 </div>
                 <div class="form-group">
                     <label for="vtm-artist">Artist:</label>
-                    <input type="text" class="form-control" name="vtm-artist" placeholder="Artist/Band">
+                    <input type="text" class="form-control" name="vtm_artist" placeholder="Artist/Band">
                 </div>
-                <button type="submit" class="btn btn-default" name="vtm-submit">Submit</button>
+                <!-- <button type="submit" class="btn btn-default" name="vtm_submit" value="submit">Submit</button> -->
+                <input type="submit" name="vtm_submit" class="btn btn-default" value="Submit">
             </form>
         </div>
     </div>
