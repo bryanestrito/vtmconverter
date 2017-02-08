@@ -64,7 +64,7 @@ class VideoDownloader
 
         $options = [
             'format' => '140',
-            'output' => "\"{$filename}\".%\(ext\)s"
+            'output' => "{$filename}.%(ext)s"
         ];
 
         $youtubeDl = new YoutubeDl($options);
@@ -75,13 +75,14 @@ class VideoDownloader
             echo $video->getTitle(); // Will return Phonebloks
             // $video->getFile(); // \SplFileInfo instance of downloaded file
         } catch (NotFoundException $e) {
-            // Video not found
+            dd('Video not found');
         } catch (PrivateVideoException $e) {
-            // Video is private
+            dd('Video is private');
         } catch (CopyrightException $e) {
-            // The YouTube account associated with this video has been terminated due to multiple third-party notifications of copyright infringement
+            dd('The YouTube account associated with this video has been terminated due to multiple third-party notifications of copyright infringement');
         } catch (\Exception $e) {
-            // Failed to download
+            dd($e);
+            dd('Failed to download');
         }
     }
 }
