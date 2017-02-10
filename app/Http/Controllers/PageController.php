@@ -22,6 +22,6 @@ class PageController extends Controller
         $url = "https://www.youtube.com/watch?v=iuZqraRSLaE&list=PLmCX3nN4cbi5GRa2vyl2jyXypOK6Lank4&index=4";
 
         $videoDownloader = new VideoDownloader($url);
-        $videoDownloader->downloadVideo('Prom - Sugarfree');
+        $videoDownloader->downloadVideo();
     }
 }

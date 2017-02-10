@@ -23,9 +23,11 @@ class VideoDownloader
 
     public function composeDownloadPath()
     {
-        $folderPath = Carbon::now()->format('Y/m/d');
+        // $folderPath = Carbon::now()->format('Y/m/d');
 
-        return public_path() . self::DOWNLOAD_FOLDER . $folderPath;
+        // return public_path() . self::DOWNLOAD_FOLDER . $folderPath;
+
+        return public_path() . self::DOWNLOAD_FOLDER;
     }
 
     public function generateDownloadPath()
@@ -48,19 +50,17 @@ class VideoDownloader
         return true;
     }
 
-    public function generateFilename($filename = null)
+    public function generateFilename()
     {
-        if (!$filename) {
-            $filename = Carbon::now()->format('YmdHis');
-        }
+        parse_str(parse_url($this->url, PHP_URL_QUERY), $queryString);
 
-        return $filename;
+        return $queryString['v'];
     }
 
-    public function downloadVideo($filename = null)
+    public function downloadVideo()
     {
         $downloadPath = $this->generateDownloadPath();
-        $filename = $this->generateFilename($filename);
+        $filename = $this->generateFilename();
 
         $options = [
             'format' => '140',
@@ -72,7 +72,8 @@ class VideoDownloader
 
         try {
             $video = $youtubeDl->download($this->url);
-            echo $video->getTitle(); // Will return Phonebloks
+
+            return $video->getId(); // Will return Phonebloks
             // $video->getFile(); // \SplFileInfo instance of downloaded file
         } catch (NotFoundException $e) {
             dd('Video not found');
