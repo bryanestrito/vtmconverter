@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Libraries;
+
+use FFMpeg\FFMpeg;
+
 class VideoConverter
 {
     protected $mediaFile;

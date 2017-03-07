@@ -11,14 +11,16 @@ use Carbon\Carbon;
 class VideoDownloader
 {
     public $url;
-    public $title;
-    public $artist;
+    public $youtubeID;
+    public $downloadPath;
 
     const DOWNLOAD_FOLDER = '/downloads/';
 
     public function __construct($url)
     {
         $this->url = $url;
+
+        $this->generateDownloadPath();
     }
 
     public function composeDownloadPath()
@@ -30,17 +32,6 @@ class VideoDownloader
         return public_path() . self::DOWNLOAD_FOLDER;
     }
 
-    public function generateDownloadPath()
-    {
-        $downloadPath = $this->composeDownloadPath();
-
-        if (!$this->createDownloadFolder($downloadPath)) {
-            throw new Exception("Cannot create download folder");
-        }
-
-        return $downloadPath;
-    }
-
     public function createDownloadFolder($downloadPath)
     {
         if (!is_dir($downloadPath)) {
@@ -50,31 +41,44 @@ class VideoDownloader
         return true;
     }
 
-    public function generateFilename()
+    public function generateDownloadPath()
+    {
+        $downloadPath = $this->composeDownloadPath();
+
+        if (!$this->createDownloadFolder($downloadPath)) {
+            throw new Exception("Cannot create download folder");
+        }
+
+        $this->downloadPath = $downloadPath;
+    }
+
+    public function getYoutubeID()
     {
         parse_str(parse_url($this->url, PHP_URL_QUERY), $queryString);
+
+        if (!array_key_exists('v', $queryString)) {
+            throw new Exception("Unable to find youtube id");
+        }
 
         return $queryString['v'];
     }
 
     public function downloadVideo()
     {
-        $downloadPath = $this->generateDownloadPath();
-        $filename = $this->generateFilename();
+        $youtubeID = $this->getYoutubeID();
 
         $options = [
             'format' => '140',
-            'output' => "{$filename}.%(ext)s"
+            'output' => "{$youtubeID}.%(ext)s"
         ];
 
         $youtubeDl = new YoutubeDl($options);
-        $youtubeDl->setDownloadPath($downloadPath);
+        $youtubeDl->setDownloadPath($this->downloadPath);
 
         try {
             $video = $youtubeDl->download($this->url);
 
-            return $video->getId(); // Will return Phonebloks
-            // $video->getFile(); // \SplFileInfo instance of downloaded file
+            return $video->getId();
         } catch (NotFoundException $e) {
             dd('Video not found');
         } catch (PrivateVideoException $e) {
