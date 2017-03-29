@@ -78,7 +78,7 @@ class VideoDownloader
         try {
             $video = $youtubeDl->download($this->url);
 
-            return $video->getId();
+            return $video['_filename'];
         } catch (NotFoundException $e) {
             dd('Video not found');
         } catch (PrivateVideoException $e) {

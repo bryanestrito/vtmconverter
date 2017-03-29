@@ -39,9 +39,9 @@ class VideoConverter
     {
         $ffmpegTags = ['title', 'artist', 'album'];
 
-        foreach ($tags as $t => $tag) {
+        foreach ($tags as $tag => $value) {
             if (!in_array($tag, $ffmpegTags)) {
-                throw new Exception("Invalid meta tag!");
+                throw new \Exception("Invalid meta tag!");
             }
         }
 
@@ -52,5 +52,24 @@ class VideoConverter
     {
         $this->startTime = $startTime;
         $this->endTime = $endTime;
+    }
+
+    public function convertAudio()
+    {
+        $ffmpeg = FFMpeg::create();
+        $audio = $ffmpeg->open($this->mediaFile);
+
+        // waveform image
+        $waveform = $audio->waveform(640, 120);
+        $waveform->save(public_path() . self::CONVERTER_FOLDER . 'waveform.png');
+
+        // // meta data
+        // $audio->filters()->addMetadata($this->tags);
+
+        // // format
+        // $format = new FFMpeg\Format\Audio\Aac();
+        // $format->setAudioKiloBitrate(256);
+
+        // $audio->save($format, public_path(). self::CONVERTER_FOLDER . $this->filename);
     }
 }
